@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Present Tense Voting</title>
     
-    <!-- iOS Web App Meta Tags to hide Safari UI -->
+    <!-- iOS Web App Meta Tags to hide Safari UI and lock dimensions -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SAM Vote">
@@ -19,21 +19,54 @@
             height: 100%;
             overflow: hidden;
             background-color: #ffffff;
+            /* Prevents NeatKiosk/iOS accessibility from forcing custom text sizes */
+            -webkit-text-size-adjust: 100%; 
         }
-        /* Lock the Google Form inside the fullscreen container */
+        
+        /* Lock the Google Form inside the fullscreen container and apply system font overrides */
         iframe {
             width: 100%;
             height: 100%;
             border: none;
             margin: 0;
             padding: 0;
+            /* System font fallback block to enforce hardware rendering uniformity */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
     </style>
+    
+    <script>
+        // Time in milliseconds before the app reloads (3 minutes)
+        const idleTimeLimit = 3 * 60 * 1000; 
+        let idleTimer;
+
+        function resetTimer() {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(refreshPage, idleTimeLimit);
+        }
+
+        function refreshPage() {
+            window.location.reload();
+        }
+
+        // Listen to touches on the base shell layout, visibility changes, or app suspension
+        window.onload = resetTimer;
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer;
+        document.addEventListener("touchstart", resetTimer, true);
+        
+        // If the device screen turns off or the user resets NeatKiosk container, clear data immediately
+        document.addEventListener("visibilitychange", function() {
+            if (!document.hidden) {
+                refreshPage();
+            }
+        });
+    </script>
 </head>
 <body>
 
-    <!-- Your Google Form embedded safely -->
-    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdlIfwFy2tI663tCN2bHWkM9WRHP2rY5owa4BrWFouZPtQLcg/viewform">Loading...</iframe>
+    <!-- Updated Form link without '?embedded=true' to restore custom Google Fonts styling -->
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdlIfwFy2tI663tCN2bHWkM9WRHP2rY5owa4BrWFouZPtQLcg/viewform">Loading Form...</iframe>
 
 </body>
 </html>
