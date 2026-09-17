@@ -1,26 +1,47 @@
-<div id="kiosk-wrapper" style="background-color: #d6e4ea; width:100vw; height:100vh; margin:0; padding:0; overflow:hidden; position:fixed; top:0; left:0;">
-  <iframe id="kiosk-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSdlIfwFy2tI663tCN2bHWkM9WRHP2rY5owa4BrWFouZPtQLcg/viewform" style="position:fixed; top:0; left:0; width:100vw; height:100vh; border:none; margin:0; padding:0; display:block; z-index:999;"></iframe>
-</div>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    /* 1. Forces the parent window to match your exact slate-blue color */
+    html, body {
+      background-color: #d6e4ea !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      width: 100vw !important;
+      height: 100vh !important;
+    }
 
-<script>
-  // Crucial: This intercepts the container frame directly
-  var formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdlIfwFy2tI663tCN2bHWkM9WRHP2rY5owa4BrWFouZPtQLcg/viewform";
-  
-  // This function forces a violent DOM rebuild of the iframe from scratch, 
-  // bypassing browser navigation restrictions so the form never turns white or goes missing.
-  function forceKioskReset() {
-    var wrapper = document.getElementById('kiosk-wrapper');
-    wrapper.innerHTML = ''; // Wipes the old iframe completely out of memory
-    
-    // Injects a brand new instance instantly
-    var newIframe = document.createElement('iframe');
-    newIframe.src = formUrl + "?t=" + new Date().getTime(); // Appends cache-buster timestamp
-    newIframe.style.cssText = "position:fixed; top:0; left:0; width:100vw; height:100vh; border:none; margin:0; padding:0; display:block; z-index:999;";
-    wrapper.appendChild(newIframe);
-  }
+    /* 2. Forces NeatKiosk's rendering engine to use local iPad font files */
+    * {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, Helvetica, sans-serif !important;
+      -webkit-font-smoothing: antialiased !important;
+    }
 
-  // Fallback programmatic loop (Matches NeatKiosk logic safely)
-  window.addEventListener('message', function(e) {
-     if(e.data === 'clear') { forceKioskReset(); }
-  });
-</script>
+    .kiosk-container {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background-color: #d6e4ea !important;
+      border: none !important;
+    }
+
+    iframe {
+      width: 100% !important;
+      height: 100% !important;
+      border: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="kiosk-container">
+    <!-- Clean, standard URL layout so JavaScript remains enabled -->
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdlIfwFy2tI663tCN2bHWkM9WRHP2rY5owa4BrWFouZPtQLcg/viewform"></iframe>
+  </div>
+
+</body>
+</html>
