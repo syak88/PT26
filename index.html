@@ -1,72 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Present Tense Voting</title>
+<div id="kiosk-wrapper" style="background-color: #d6e4ea; width:100vw; height:100vh; margin:0; padding:0; overflow:hidden; position:fixed; top:0; left:0;">
+  <iframe id="kiosk-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSdlIfwFy2tI663tCN2bHWkM9WRHP2rY5owa4BrWFouZPtQLcg/viewform" style="position:fixed; top:0; left:0; width:100vw; height:100vh; border:none; margin:0; padding:0; display:block; z-index:999;"></iframe>
+</div>
+
+<script>
+  // Crucial: This intercepts the container frame directly
+  var formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdlIfwFy2tI663tCN2bHWkM9WRHP2rY5owa4BrWFouZPtQLcg/viewform";
+  
+  // This function forces a violent DOM rebuild of the iframe from scratch, 
+  // bypassing browser navigation restrictions so the form never turns white or goes missing.
+  function forceKioskReset() {
+    var wrapper = document.getElementById('kiosk-wrapper');
+    wrapper.innerHTML = ''; // Wipes the old iframe completely out of memory
     
-    <!-- iOS Web App Meta Tags to hide Safari UI and lock dimensions -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="SAM Vote">
+    // Injects a brand new instance instantly
+    var newIframe = document.createElement('iframe');
+    newIframe.src = formUrl + "?t=" + new Date().getTime(); // Appends cache-buster timestamp
+    newIframe.style.cssText = "position:fixed; top:0; left:0; width:100vw; height:100vh; border:none; margin:0; padding:0; display:block; z-index:999;";
+    wrapper.appendChild(newIframe);
+  }
 
-    <style>
-        /* Force the wrapper to take up 100% of the screen without scrolling */
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #ffffff;
-            /* Prevents NeatKiosk/iOS accessibility from forcing custom text sizes */
-            -webkit-text-size-adjust: 100%; 
-        }
-        
-        /* Lock the Google Form inside the fullscreen container and apply system font overrides */
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            margin: 0;
-            padding: 0;
-            /* System font fallback block to enforce hardware rendering uniformity */
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-    </style>
-    
-    <script>
-        // Time in milliseconds before the app reloads (3 minutes)
-        const idleTimeLimit = 3 * 60 * 1000; 
-        let idleTimer;
-
-        function resetTimer() {
-            clearTimeout(idleTimer);
-            idleTimer = setTimeout(refreshPage, idleTimeLimit);
-        }
-
-        function refreshPage() {
-            window.location.reload();
-        }
-
-        // Listen to touches on the base shell layout, visibility changes, or app suspension
-        window.onload = resetTimer;
-        document.onmousemove = resetTimer;
-        document.onkeypress = resetTimer;
-        document.addEventListener("touchstart", resetTimer, true);
-        
-        // If the device screen turns off or the user resets NeatKiosk container, clear data immediately
-        document.addEventListener("visibilitychange", function() {
-            if (!document.hidden) {
-                refreshPage();
-            }
-        });
-    </script>
-</head>
-<body>
-
-    <!-- Updated Form link without '?embedded=true' to restore custom Google Fonts styling -->
-    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdlIfwFy2tI663tCN2bHWkM9WRHP2rY5owa4BrWFouZPtQLcg/viewform">Loading Form...</iframe>
-
-</body>
-</html>
+  // Fallback programmatic loop (Matches NeatKiosk logic safely)
+  window.addEventListener('message', function(e) {
+     if(e.data === 'clear') { forceKioskReset(); }
+  });
+</script>
